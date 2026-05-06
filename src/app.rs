@@ -554,7 +554,7 @@ fn compress_one(
         Ok(processed) => {
             let compressed_size = processed.size();
             let ratio = if orig_size > 0 {
-                (1.0 - compressed_size as f32 / orig_size as f32).clamp(0.0, 1.0)
+                compressed_size as f32 / orig_size as f32
             } else {
                 0.0
             };

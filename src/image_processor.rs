@@ -97,7 +97,9 @@ pub struct ImageProcessor;
 impl ImageProcessor {
     /// Compress/convert a file on disk.
     pub fn process(input_path: &Path, options: &CompressionOptions) -> Result<ProcessedImage> {
-        let img = image::open(input_path)
+        let img = image::ImageReader::open(input_path)?
+            .with_guessed_format()?
+            .decode()
             .with_context(|| format!("Cannot open image: {}", input_path.display()))?;
 
         Self::process_image(img, options)
@@ -204,7 +206,7 @@ impl ImageProcessor {
         .map_err(|e| anyhow::anyhow!("oxipng: {e}"))?;
 
         // Map quality 1–100 → preset 6–1
-        let preset = ((100 - quality.min(100)) * 6 / 99).min(6) as u8;
+        let preset = (((100 - quality.min(100)) as u32 * 6) / 99).min(6) as u8;
         let opts = oxipng::Options::from_preset(preset);
 
         raw.create_optimized_png(&opts)
@@ -231,7 +233,7 @@ impl ImageProcessor {
 
     // ── Thumbnail ────────────────────────────────────────────
     pub fn generate_thumbnail(path: &Path, size: u32) -> Result<DynamicImage> {
-        let img = image::open(path)?;
+        let img = image::ImageReader::open(path)?.with_guessed_format()?.decode()?;
         Ok(img.thumbnail(size, size))
     }
 
