@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelCrush — Image Optimizer</title>
+    <meta name="description" content="Efficient, fast, and open-source desktop image compressor built with Rust and Slint.">
+    <style>
+        :root {
+            --bg-color: #0d0d1a;
+            --surface-color: #1e1e38;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-glow: #7c3aed;
+            --accent-light: #a78bfa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(13, 13, 26, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand img {
+            height: 40px;
+        }
+
+        .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-light);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .hero {
+            padding: 6rem 5% 4rem;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-inline: auto;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--accent-glow);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.6);
+            background: #6d28d9;
+        }
+
+        .banner-container {
+            margin-top: 4rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .banner-container img {
+            width: 100%;
+            display: block;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--surface-color);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-card h3 {
+            color: var(--accent-light);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 5%;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        footer a {
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        /* Ambient glow effect */
+        .glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, rgba(13, 13, 26, 0) 70%);
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="glow"></div>
+    
+    <header class="header">
+        <a href="#" class="brand">
+            <img src="assets/logo.png" alt="PixelCrush Logo">
+            <h1>PixelCrush</h1>
+        </a>
+        <nav class="nav-links">
+            <a href="https://github.com/torocruzand/imageConverter">GitHub Repo</a>
+            <a href="https://github.com/torocruzand/imageConverter/releases">Releases</a>
+        </nav>
+    </header>
+
+    <main class="hero">
+        <h2 class="hero-title">Beautiful Image Optimization</h2>
+        <p class="hero-subtitle">Compress your images locally with incredible speed. Open-source, built with Rust and Slint.</p>
+        
+        <a href="https://github.com/torocruzand/imageConverter/releases/latest" class="download-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download for Mac / Windows / Linux
+        </a>
+
+        <div class="banner-container">
+            <img src="assets/banner.png" alt="PixelCrush App Interface">
+        </div>
+    </main>
+
+    <section class="features">
+        <div class="feature-card">
+            <h3>⚡ Lightning Fast</h3>
+            <p>Powered by Rust and multi-threading to process images significantly faster than web-based alternatives.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🔒 100% Local & Private</h3>
+            <p>Your images never leave your device. Complete privacy without cloud dependencies or upload times.</p>
+        </div>
+        <div class="feature-card">
+            <h3>✨ Modern Interface</h3>
+            <p>A lightweight, GPU-accelerated UI crafted with Slint for a smooth and responsive experience.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>PixelCrush &copy; 2026 by <a href="https://torocruzand.com" target="_blank">ToroCruzAnd</a>. Released under the MIT License.</p>
+        <p style="margin-top: 0.5rem; opacity: 0.7;">Made with Rust and <a href="https://slint.dev" target="_blank">Slint</a></p>
+    </footer>
+</body>
+</html>
