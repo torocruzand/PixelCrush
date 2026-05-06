@@ -89,7 +89,8 @@ export component ImageCard inherits Rectangle {
         }
 
         // Compare button — own TouchArea, on TOP of card-hover-ta
-        if image-data.status == "done": compare-btn := Rectangle {
+        compare-btn := Rectangle {
+            visible: image-data.status == "done";
             x: 10px; y: 10px;
             width: 78px; height: 26px;
             border-radius: 13px;
@@ -103,10 +104,6 @@ export component ImageCard inherits Rectangle {
                 horizontal-alignment: center; vertical-alignment: center;
             }
             compare-ta := TouchArea { clicked => { root.view-comparison(); } }
-        }
-        if image-data.status != "done": Rectangle {
-            // invisible dummy to keep compare-ta valid
-            compare-ta := TouchArea { visible: false; }
         }
 
         // Remove button — shown when card is hovered
@@ -227,7 +224,8 @@ export component ImageCard inherits Rectangle {
             }
 
             // Save button (only when done)
-            if image-data.status == "done": save-rect := Rectangle {
+            save-rect := Rectangle {
+                visible: image-data.status == "done";
                 width: 34px; height: 34px; border-radius: 8px;
                 background: save-ta.has-hover ? #00d4aa30 : #00d4aa20;
                 border-color: #00d4aa50; border-width: 1px;
@@ -238,10 +236,6 @@ export component ImageCard inherits Rectangle {
                     horizontal-alignment: center; vertical-alignment: center;
                 }
                 save-ta := TouchArea { clicked => { root.save(); } }
-            }
-            if image-data.status != "done": Rectangle {
-                // invisible dummy to keep save-ta valid
-                save-ta := TouchArea { visible: false; }
             }
         }
     }
