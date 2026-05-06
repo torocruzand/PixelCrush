@@ -1,5 +1,5 @@
 use anyhow::Result;
-use image::DynamicImage;
+
 use slint::{Image, Model, ModelRc, Rgba8Pixel, SharedPixelBuffer, SharedString, VecModel};
 use std::path::PathBuf;
 use std::rc::Rc;
