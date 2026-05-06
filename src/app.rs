@@ -529,17 +529,3 @@ fn update_item<F: FnOnce(&mut ImageItem)>(ui: &AppWindow, index: usize, f: F) {
     }
 }
 
-// ──────────────────────────────────────────────────────────────
-// Helper: DynamicImage → Slint Image  (must be called on main thread)
-// ──────────────────────────────────────────────────────────────
-pub fn dynamic_to_slint(img: DynamicImage) -> Option<Image> {
-    let rgba = img.to_rgba8();
-    let (w, h) = rgba.dimensions();
-    let raw = rgba.into_raw();
-    let buf = SharedPixelBuffer::<Rgba8Pixel>::clone_from_slice(
-        bytemuck::cast_slice(&raw),
-        w,
-        h,
-    );
-    Some(Image::from_rgba8(buf))
-}
