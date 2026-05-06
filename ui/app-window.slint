@@ -18,7 +18,7 @@ export component AppWindow inherits Window {
     preferred-width: 1280px;
     preferred-height: 860px;
     background: #0d0d1a;
-    icon: @image-url("../assets/logo.png");
+    icon: @image-url("../assets/icon.png");
 
     in-out property <[ImageItem]> images: [];
     in property <bool> is-processing: false;
@@ -78,62 +78,24 @@ export component AppWindow inherits Window {
                     spacing: 20px;
                     alignment: start;
 
-                    // Row 0
-                    if images.length > 0: HorizontalLayout {
-                        spacing: 20px; alignment: start;
-                        for img[i] in root.images: ImageCard {
-                            visible: i < 4;
-                            image-data: img; index: i;
-                            remove => { root.remove-image(i); }
-                            quality-changed(q) => { root.set-quality(i, q); }
-                            compress => { root.compress-single(i, img.quality); }
-                            format-changed(f) => { root.set-format(i, f); }
-                            view-comparison => { root.comparison-index = i; }
-                            save => { root.export-image(i, img.target-format); }
-                        }
+                // Responsive dynamic grid for any number of images
+                Rectangle {
+                    property <int> cols: Math.max(1, Math.floor((root.width - 48px) / 300px));
+                    height: 24px + Math.ceil(images.length / cols) * 470px;
+
+                    for img[i] in root.images: ImageCard {
+                        x: 24px + (i - Math.floor(i / cols) * cols) * 300px;
+                        y: 24px + Math.floor(i / cols) * 470px;
+                        
+                        image-data: img; index: i;
+                        remove => { root.remove-image(i); }
+                        quality-changed(q) => { root.set-quality(i, q); }
+                        compress => { root.compress-single(i, img.quality); }
+                        format-changed(f) => { root.set-format(i, f); }
+                        view-comparison => { root.comparison-index = i; }
+                        save => { root.export-image(i, img.target-format); }
                     }
-                    // Row 1
-                    if images.length > 4: HorizontalLayout {
-                        spacing: 20px; alignment: start;
-                        for img[i] in root.images: ImageCard {
-                            visible: i >= 4 && i < 8;
-                            image-data: img; index: i;
-                            remove => { root.remove-image(i); }
-                            quality-changed(q) => { root.set-quality(i, q); }
-                            compress => { root.compress-single(i, img.quality); }
-                            format-changed(f) => { root.set-format(i, f); }
-                            view-comparison => { root.comparison-index = i; }
-                            save => { root.export-image(i, img.target-format); }
-                        }
-                    }
-                    // Row 2
-                    if images.length > 8: HorizontalLayout {
-                        spacing: 20px; alignment: start;
-                        for img[i] in root.images: ImageCard {
-                            visible: i >= 8 && i < 12;
-                            image-data: img; index: i;
-                            remove => { root.remove-image(i); }
-                            quality-changed(q) => { root.set-quality(i, q); }
-                            compress => { root.compress-single(i, img.quality); }
-                            format-changed(f) => { root.set-format(i, f); }
-                            view-comparison => { root.comparison-index = i; }
-                            save => { root.export-image(i, img.target-format); }
-                        }
-                    }
-                    // Row 3
-                    if images.length > 12: HorizontalLayout {
-                        spacing: 20px; alignment: start;
-                        for img[i] in root.images: ImageCard {
-                            visible: i >= 12 && i < 16;
-                            image-data: img; index: i;
-                            remove => { root.remove-image(i); }
-                            quality-changed(q) => { root.set-quality(i, q); }
-                            compress => { root.compress-single(i, img.quality); }
-                            format-changed(f) => { root.set-format(i, f); }
-                            view-comparison => { root.comparison-index = i; }
-                            save => { root.export-image(i, img.target-format); }
-                        }
-                    }
+                }
 
                     // ─── About / Credits section ─────────────────────────────────
                     Rectangle {
@@ -266,7 +228,7 @@ export component AppWindow inherits Window {
 
                             // Version / copyright
                             Text {
-                                text: "PixelCrush v1.0.2 — © 2025 — MIT License";
+                                text: "PixelCrush v1.0.2 — © 2026 ToroCruzAnd — MIT License";
                                 color: #334155; font-size: 10px;
                                 horizontal-alignment: right;
                             }

@@ -13,7 +13,7 @@ export component ImageCard inherits Rectangle {
     callback save();
 
     width: 280px;
-    height: 430px;
+    height: 450px;
     border-radius: 16px;
     property <bool> is-hovered: card-hover-ta.has-hover || remove-ta.has-hover
         || compare-ta.has-hover || slider-ta.has-hover
@@ -178,6 +178,7 @@ export component ImageCard inherits Rectangle {
                 height: 6px; border-radius: 3px; background: #1e1e38;
 
                 Rectangle {
+                    x: 0;
                     width: parent.width * (image-data.quality / 100.0);
                     height: 6px; border-radius: 3px;
                     background: @linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
