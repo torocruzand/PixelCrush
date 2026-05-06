@@ -36,9 +36,8 @@ export component AppWindow inherits Window {
     callback set-format(int, string);
     callback save-all();
     callback close-comparison();
-    callback set-limit-size(int, bool);
     callback set-target-size-percent(int, int);
-    callback set-max-dimension(int, string);
+    callback set-max-dimension(int, int);
     callback apply-to-all(int);
 
     // ─── EMPTY STATE: Drop Zone ───────────────────────────────────────────
@@ -108,7 +107,6 @@ export component AppWindow inherits Window {
                             view-comparison => { root.comparison-index = i; }
                             save => { root.export-image(i, img.target-format); }
                             
-                            limit-size-changed(v) => { root.set-limit-size(i, v); }
                             target-size-percent-changed(p) => { root.set-target-size-percent(i, p); }
                             max-dimension-changed(d) => { root.set-max-dimension(i, d); }
                             apply-to-all => { root.apply-to-all(i); }
