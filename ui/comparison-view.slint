@@ -1,0 +1,240 @@
+export component ComparisonSlider inherits Rectangle {
+    background: #000000cc;
+    in property <image> before-image;
+    in property <image> after-image;
+    in property <string> file-name: "";
+    in property <int> original-size: 0;
+    in property <int> compressed-size: 0;
+
+    callback close();
+
+    property <float> split: 0.5;
+    property <bool> dragging: false;
+
+    // Backdrop blur effect (simulated with semi-transparent overlay)
+    Rectangle {
+        x: 0; y: 0;
+        width: parent.width;
+        height: parent.height;
+        background: #000000b0;
+    }
+
+    // Main card
+    Rectangle {
+        x: (parent.width - 900px) / 2;
+        y: (parent.height - 620px) / 2;
+        width: 900px;
+        height: 620px;
+        border-radius: 24px;
+        background: #12122a;
+        border-color: #ffffff18;
+        border-width: 1px;
+        drop-shadow-color: #00000080;
+        drop-shadow-blur: 40px;
+        drop-shadow-offset-y: 12px;
+        clip: false;
+
+        VerticalLayout {
+            padding: 0px;
+            spacing: 0px;
+
+            // Header
+            Rectangle {
+                height: 56px;
+                border-radius: 24px;
+                background: #161630;
+
+                HorizontalLayout {
+                    padding-left: 20px;
+                    padding-right: 16px;
+                    spacing: 12px;
+                    alignment: center;
+
+                    Text {
+                        text: "↔  Comparison — " + file-name;
+                        color: #e2e8f0;
+                        font-size: 14px;
+                        font-weight: 600;
+                        vertical-alignment: center;
+                    }
+
+                    Rectangle { horizontal-stretch: 1; }
+
+                    // Sizes
+                    Text {
+                        text: format-bytes(original-size) + " → " + format-bytes(compressed-size);
+                        color: #00d4aa;
+                        font-size: 13px;
+                        font-weight: 700;
+                        vertical-alignment: center;
+                    }
+
+                    // Close
+                    close-btn := Rectangle {
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 16px;
+                        background: #ef444420;
+                        border-color: #ef444440;
+                        border-width: 1px;
+                        animate background { duration: 130ms; }
+
+                        Text {
+                            text: "×";
+                            color: #f87171;
+                            font-size: 16px;
+                            font-weight: 700;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+
+                        TouchArea {
+                            clicked => { root.close(); }
+                        }
+
+                        states [
+                            hovered when close-ta.has-hover: { background: #ef444440; }
+                        ]
+                        close-ta := TouchArea {}
+                    }
+                }
+            }
+
+            // Comparison area
+            img-area := Rectangle {
+                border-radius: 16px;
+                clip: true;
+                background: #060612;
+
+                // After image (compressed) — full width background
+                Image {
+                    source: after-image;
+                    width: 100%;
+                    height: 100%;
+                    image-fit: contain;
+                }
+
+                // Before image (original) — clipped to split
+                Rectangle {
+                    x: 0;
+                    y: 0;
+                    width: parent.width * split;
+                    height: parent.height;
+                    clip: true;
+
+                    Image {
+                        x: 0;
+                        y: 0;
+                        source: before-image;
+                        width: img-area.width;
+                        height: img-area.height;
+                        image-fit: contain;
+                    }
+                }
+
+                // Labels
+                Rectangle {
+                    x: 12px;
+                    y: 12px;
+                    width: 70px;
+                    height: 26px;
+                    border-radius: 13px;
+                    background: #00000080;
+
+                    Text {
+                        text: "ORIGINAL";
+                        color: #94a3b8;
+                        font-size: 10px;
+                        font-weight: 700;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+
+                Rectangle {
+                    x: parent.width - 84px;
+                    y: 12px;
+                    width: 72px;
+                    height: 26px;
+                    border-radius: 13px;
+                    background: #00000080;
+
+                    Text {
+                        text: "OPTIMIZED";
+                        color: #00d4aa;
+                        font-size: 10px;
+                        font-weight: 700;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+
+                // Divider line
+                Rectangle {
+                    x: parent.width * split - 2px;
+                    y: 0;
+                    width: 4px;
+                    height: parent.height;
+                    background: #a78bfa;
+                    animate x { duration: dragging ? 0ms : 80ms; }
+                }
+
+                // Handle
+                Rectangle {
+                    x: parent.width * split - 22px;
+                    y: (parent.height - 44px) / 2;
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 22px;
+                    background: #a78bfa;
+                    border-color: #fff;
+                    border-width: 2px;
+                    drop-shadow-color: #00000060;
+                    drop-shadow-blur: 8px;
+                    animate x { duration: dragging ? 0ms : 80ms; }
+
+                    Text {
+                        text: "↔";
+                        color: #fff;
+                        font-size: 18px;
+                        font-weight: 700;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+
+                // Touch area for dragging
+                TouchArea {
+                    moved => {
+                        if self.pressed {
+                            root.split = clamp(self.mouse-x / img-area.width, 0.02, 0.98);
+                            root.dragging = true;
+                        }
+                    }
+                    pointer-event(e) => {
+                        if e.kind == PointerEventKind.up {
+                            root.dragging = false;
+                        }
+                        if e.button == PointerEventButton.left && e.kind == PointerEventKind.down {
+                            root.split = clamp(self.mouse-x / img-area.width, 0.02, 0.98);
+                            root.dragging = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Click outside to close
+    TouchArea {
+        z: -1;
+        clicked => { root.close(); }
+    }
+
+    pure function format-bytes(bytes: int) -> string {
+        if bytes <= 0 { return "—"; }
+        if bytes < 1024 { return bytes + " B"; }
+        if bytes < 1048576 { return round(bytes / 102.4) / 10 + " KB"; }
+        return round(bytes / 104857.6) / 10 + " MB";
+    }
+}

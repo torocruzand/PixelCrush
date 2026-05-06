@@ -1,0 +1,118 @@
+export component ToolBar inherits Rectangle {
+    height: 76px;
+    background: #0d0d1a;
+
+    // bottom border
+    Rectangle {
+        x: 0; y: parent.height - 1px;
+        width: parent.width; height: 1px;
+        background: #ffffff10;
+    }
+
+    in property <int> image-count;
+    in property <bool> is-processing;
+    in property <string> status-text;
+
+    callback compress-all();
+    callback add-more();
+    callback save-all();
+    callback clear-all();
+
+    HorizontalLayout {
+        padding-left: 24px;
+        padding-right: 24px;
+        spacing: 12px;
+        alignment: center;
+
+        // Logo
+        Text {
+            text: "✦ PixelCrush";
+            color: #a78bfa; font-size: 18px; font-weight: 800;
+            vertical-alignment: center;
+        }
+
+        Rectangle { horizontal-stretch: 1; }
+
+        // Status text
+        if status-text != "": Text {
+            text: status-text;
+            color: #64748b; font-size: 12px;
+            vertical-alignment: center;
+        }
+
+        // Count badge (no interaction)
+        Rectangle {
+            width: 80px; height: 36px;
+            border-radius: 18px;
+            background: #7c3aed18; border-color: #7c3aed40; border-width: 1px;
+            Text {
+                text: image-count + (image-count == 1 ? " image" : " images");
+                color: #a78bfa; font-size: 12px; font-weight: 600;
+                horizontal-alignment: center; vertical-alignment: center;
+            }
+        }
+
+        // ── Add More ──────────────────────────────────────────────────
+        add-btn := Rectangle {
+            width: 110px; height: 36px;
+            border-radius: 8px;
+            background: add-ta.has-hover ? #2a2a4a : #1e1e38;
+            border-color: #ffffff18; border-width: 1px;
+            animate background { duration: 150ms; }
+
+            Text {
+                text: "+ Add More";
+                color: #94a3b8; font-size: 12px; font-weight: 600;
+                horizontal-alignment: center; vertical-alignment: center;
+            }
+            // Single TouchArea — last = on top
+            add-ta := TouchArea { clicked => { root.add-more(); } }
+        }
+
+        // ── Compress All ──────────────────────────────────────────────
+        compress-btn := Rectangle {
+            width: 130px; height: 36px;
+            border-radius: 8px;
+            background: is-processing ? #3b1f7a : #7c3aed;
+            animate background { duration: 200ms; }
+
+            Text {
+                text: is-processing ? "Processing…" : "⚡ Compress All";
+                color: #fff; font-size: 12px; font-weight: 700;
+                horizontal-alignment: center; vertical-alignment: center;
+            }
+            TouchArea { clicked => { root.compress-all(); } }
+        }
+
+        // ── Save All ──────────────────────────────────────────────────
+        save-btn := Rectangle {
+            width: 100px; height: 36px;
+            border-radius: 8px;
+            background: save-ta.has-hover ? #00d4aa30 : #00d4aa20;
+            border-color: #00d4aa60; border-width: 1px;
+            animate background { duration: 150ms; }
+
+            Text {
+                text: "⬇ Save All";
+                color: #00d4aa; font-size: 12px; font-weight: 600;
+                horizontal-alignment: center; vertical-alignment: center;
+            }
+            save-ta := TouchArea { clicked => { root.save-all(); } }
+        }
+
+        // ── Clear ─────────────────────────────────────────────────────
+        clear-btn := Rectangle {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: clear-ta.has-hover ? #ef444430 : #ef444418;
+            border-color: #ef444430; border-width: 1px;
+            animate background { duration: 150ms; }
+
+            Text {
+                text: "🗑"; font-size: 14px;
+                horizontal-alignment: center; vertical-alignment: center;
+            }
+            clear-ta := TouchArea { clicked => { root.clear-all(); } }
+        }
+    }
+}

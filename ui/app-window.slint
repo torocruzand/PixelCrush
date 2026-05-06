@@ -1,0 +1,219 @@
+import {
+    VerticalBox,
+    HorizontalBox,
+    ScrollView,
+    Button,
+} from "std-widgets.slint";
+
+import { DropZone } from "drop-zone.slint";
+import { ImageCard } from "image-card.slint";
+import { ToolBar } from "toolbar.slint";
+import { ComparisonSlider } from "comparison-view.slint";
+import { ImageItem } from "types.slint";
+
+export { ImageItem }
+
+export component AppWindow inherits Window {
+    title: "PixelCrush — Image Optimizer";
+    preferred-width: 1280px;
+    preferred-height: 860px;
+    background: #0d0d1a;
+
+    in-out property <[ImageItem]> images: [];
+    in property <bool> is-processing: false;
+    in property <string> status-text: "Drop images here";
+    in-out property <int> comparison-index: -1;
+
+    callback add-images();
+    callback remove-image(int);
+    callback compress-all();
+    callback compress-single(int, int);
+    callback export-image(int, string);
+    callback drop-files([string]);
+    callback set-quality(int, int);
+    callback set-format(int, string);
+    callback save-all();
+    callback close-comparison();
+
+    // ─── EMPTY STATE: Drop Zone ───────────────────────────────────────────
+    if images.length == 0: DropZone {
+        width: root.width;
+        x: -1px;
+        y: -0px;
+        height: root.height;
+        clicked => {
+            root.add-images();
+        }
+    }
+
+    // ─── MAIN VIEW ───────────────────────────────────────────────────────
+    if images.length > 0: Rectangle {
+        background: #0d0d1a;
+        width: root.width;
+        height: root.height;
+
+        VerticalLayout {
+            padding: 0px;
+            spacing: 0px;
+
+            // Header / Toolbar
+            ToolBar {
+                image-count: images.length;
+                is-processing: root.is-processing;
+                status-text: root.status-text;
+                compress-all => {
+                    root.compress-all();
+                }
+                add-more => {
+                    root.add-images();
+                }
+                save-all => {
+                    root.save-all();
+                }
+                clear-all => {
+                    root.images = [];
+                }
+            }
+
+            // Image grid (scrollable)
+            ScrollView {
+                height: root.height - 76px;
+
+                VerticalLayout {
+                    padding: 24px;
+                    spacing: 20px;
+                    alignment: start;
+
+                    // Row 0
+                    if images.length > 0: HorizontalLayout {
+                        spacing: 20px;
+                        alignment: start;
+                        for img[i] in root.images: ImageCard {
+                            visible: i < 4;
+                            image-data: img;
+                            index: i;
+                            remove => {
+                                root.remove-image(i);
+                            }
+                            quality-changed(q) => {
+                                root.set-quality(i, q);
+                            }
+                            compress => {
+                                root.compress-single(i, img.quality);
+                            }
+                            format-changed(f) => {
+                                root.set-format(i, f);
+                            }
+                            view-comparison => {
+                                root.comparison-index = i;
+                            }
+                            save => {
+                                root.export-image(i, img.target-format);
+                            }
+                        }
+                    }
+                    // Row 1
+                    if images.length > 4: HorizontalLayout {
+                        spacing: 20px;
+                        alignment: start;
+                        for img[i] in root.images: ImageCard {
+                            visible: i >= 4 && i < 8;
+                            image-data: img;
+                            index: i;
+                            remove => {
+                                root.remove-image(i);
+                            }
+                            quality-changed(q) => {
+                                root.set-quality(i, q);
+                            }
+                            compress => {
+                                root.compress-single(i, img.quality);
+                            }
+                            format-changed(f) => {
+                                root.set-format(i, f);
+                            }
+                            view-comparison => {
+                                root.comparison-index = i;
+                            }
+                            save => {
+                                root.export-image(i, img.target-format);
+                            }
+                        }
+                    }
+                    // Row 2
+                    if images.length > 8: HorizontalLayout {
+                        spacing: 20px;
+                        alignment: start;
+                        for img[i] in root.images: ImageCard {
+                            visible: i >= 8 && i < 12;
+                            image-data: img;
+                            index: i;
+                            remove => {
+                                root.remove-image(i);
+                            }
+                            quality-changed(q) => {
+                                root.set-quality(i, q);
+                            }
+                            compress => {
+                                root.compress-single(i, img.quality);
+                            }
+                            format-changed(f) => {
+                                root.set-format(i, f);
+                            }
+                            view-comparison => {
+                                root.comparison-index = i;
+                            }
+                            save => {
+                                root.export-image(i, img.target-format);
+                            }
+                        }
+                    }
+                    // Row 3
+                    if images.length > 12: HorizontalLayout {
+                        spacing: 20px;
+                        alignment: start;
+                        for img[i] in root.images: ImageCard {
+                            visible: i >= 12 && i < 16;
+                            image-data: img;
+                            index: i;
+                            remove => {
+                                root.remove-image(i);
+                            }
+                            quality-changed(q) => {
+                                root.set-quality(i, q);
+                            }
+                            compress => {
+                                root.compress-single(i, img.quality);
+                            }
+                            format-changed(f) => {
+                                root.set-format(i, f);
+                            }
+                            view-comparison => {
+                                root.comparison-index = i;
+                            }
+                            save => {
+                                root.export-image(i, img.target-format);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ─── COMPARISON OVERLAY ──────────────────────────────────────────────
+    if comparison-index >= 0 && images.length > comparison-index: ComparisonSlider {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        before-image: images[comparison-index].thumbnail;
+        after-image: images[comparison-index].compressed-thumbnail;
+        file-name: images[comparison-index].file-name;
+        original-size: images[comparison-index].original-size;
+        compressed-size: images[comparison-index].compressed-size;
+        close => {
+            root.comparison-index = -1;
+        }
+    }
+}

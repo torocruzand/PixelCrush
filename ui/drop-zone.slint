@@ -1,0 +1,109 @@
+export component DropZone inherits Rectangle {
+    background: #0d0d1a;
+    callback clicked();
+
+    // Outer border card
+    Rectangle {
+        x: 40px;
+        y: 40px;
+        width: parent.width - 80px;
+        height: parent.height - 80px;
+        border-radius: 32px;
+        border-width: 2px;
+        border-color: #ffffff18;
+        background: #111125;
+
+        // Glow ring outer
+        Rectangle {
+            x: (parent.width - 400px) / 2;
+            y: (parent.height - 400px) / 2;
+            width: 400px;
+            height: 400px;
+            border-radius: 200px;
+            background: #7c3aed12;
+        }
+
+        // Glow ring inner
+        Rectangle {
+            x: (parent.width - 220px) / 2;
+            y: (parent.height - 220px) / 2;
+            width: 220px;
+            height: 220px;
+            border-radius: 110px;
+            background: #7c3aed22;
+        }
+
+        // Drop icon + label
+        VerticalLayout {
+            alignment: center;
+            spacing: 20px;
+
+            // Icon circle
+            HorizontalLayout {
+                alignment: center;
+                Rectangle {
+                    horizontal-stretch: 0;
+                    width: 96px;
+                    height: 96px;
+                    border-radius: 48px;
+                    background: #7c3aed22;
+                    border-color: #7c3aed55;
+                    border-width: 2px;
+
+                    Text {
+                        text: "⬇";
+                        font-size: 36px;
+                        color: #a78bfa;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Text {
+                text: "Drop images here";
+                font-size: 28px;
+                font-weight: 700;
+                color: #e2e8f0;
+                horizontal-alignment: center;
+            }
+
+            Text {
+                text: "or click to browse · JPEG, PNG, WebP, GIF, BMP, TIFF";
+                font-size: 15px;
+                color: #94a3b8;
+                horizontal-alignment: center;
+            }
+
+            // CTA Button
+            HorizontalLayout {
+                alignment: center;
+                cta := Rectangle {
+                    horizontal-stretch: 0;
+                    width: 200px;
+                    height: 48px;
+                    border-radius: 24px;
+                    background: cta-ta.has-hover ? #6d28d9 : #7c3aed;
+                    animate background { duration: 180ms; }
+
+                    Text {
+                        text: "Select Images";
+                        color: #fff;
+                        font-size: 15px;
+                        font-weight: 700;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+
+                    cta-ta := TouchArea {
+                        clicked => { root.clicked(); }
+                    }
+                }
+            }
+        }
+
+        TouchArea {
+            clicked => { root.clicked(); }
+        }
+    }
+}
