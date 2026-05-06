@@ -335,6 +335,33 @@ export component AppWindow inherits Window {
         }
     }
 
+    // ─── PROCESSING OVERLAY ───────────────────────────────────────────────
+    if is-processing: Rectangle {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        background: #000000a0;
+        TouchArea {} // Blocks all clicks to underneath elements
+        
+        VerticalLayout {
+            alignment: center;
+            spacing: 16px;
+            Text {
+                text: "⏳";
+                font-size: 32px;
+                horizontal-alignment: center;
+            }
+            Text {
+                text: root.status-text;
+                color: #f8fafc;
+                font-size: 16px;
+                font-weight: 600;
+                horizontal-alignment: center;
+            }
+        }
+    }
+
     // ─── COMPARISON OVERLAY ───────────────────────────────────────────────
     if comparison-index >= 0 && images.length > comparison-index: ComparisonSlider {
         x: 0;
