@@ -1,4 +1,5 @@
 import { ImageItem } from "types.slint";
+import { ComboBox } from "std-widgets.slint";
 
 export component ImageCard inherits Rectangle {
     in property <ImageItem> image-data;
@@ -12,10 +13,11 @@ export component ImageCard inherits Rectangle {
     callback save();
 
     width: 280px;
-    height: 400px;
+    height: 430px;
     border-radius: 16px;
-    // hover driven by all touch areas so it doesn't flicker when hovering buttons
-    property <bool> is-hovered: card-hover-ta.has-hover || remove-ta.has-hover || compare-ta.has-hover || slider-ta.has-hover || compress-ta.has-hover || save-ta.has-hover;
+    property <bool> is-hovered: card-hover-ta.has-hover || remove-ta.has-hover
+        || compare-ta.has-hover || slider-ta.has-hover
+        || compress-ta.has-hover || save-ta.has-hover;
     background: is-hovered ? #1c1c3a : #161630;
     border-color: #ffffff10;
     border-width: 1px;
@@ -27,7 +29,7 @@ export component ImageCard inherits Rectangle {
     // ── card-level hover detector — declared FIRST so it's BEHIND buttons ──
     card-hover-ta := TouchArea {}
 
-    // ─── Thumbnail area ───────────────────────────────────────────────
+    // ─── Thumbnail area ────────────────────────────────────────────────────
     thumb-clip := Rectangle {
         x: 0; y: 0;
         width: parent.width;
@@ -47,12 +49,9 @@ export component ImageCard inherits Rectangle {
         if image-data.status == "done": Rectangle {
             x: parent.width - 72px;
             y: 10px;
-            width: 62px;
-            height: 26px;
+            width: 62px; height: 26px;
             border-radius: 13px;
-            background: #00d4aa20;
-            border-color: #00d4aa50;
-            border-width: 1px;
+            background: #00d4aa20; border-color: #00d4aa50; border-width: 1px;
             Text {
                 text: "-" + round(image-data.compression-ratio * 100) + "%";
                 color: #00d4aa; font-size: 11px; font-weight: 700;
@@ -62,8 +61,7 @@ export component ImageCard inherits Rectangle {
 
         // Status badge — processing
         if image-data.status == "processing": Rectangle {
-            x: parent.width - 90px;
-            y: 10px;
+            x: parent.width - 90px; y: 10px;
             width: 80px; height: 26px;
             border-radius: 13px;
             background: #f59e0b20; border-color: #f59e0b50; border-width: 1px;
@@ -76,8 +74,7 @@ export component ImageCard inherits Rectangle {
 
         // Status badge — error
         if image-data.status == "error": Rectangle {
-            x: parent.width - 55px;
-            y: 10px;
+            x: parent.width - 55px; y: 10px;
             width: 45px; height: 26px;
             border-radius: 13px;
             background: #ef444420; border-color: #ef444450; border-width: 1px;
@@ -88,7 +85,7 @@ export component ImageCard inherits Rectangle {
             }
         }
 
-        // Compare button — own TouchArea, on TOP of card-hover-ta
+        // Compare button
         compare-btn := Rectangle {
             visible: image-data.status == "done";
             x: 10px; y: 10px;
@@ -97,7 +94,6 @@ export component ImageCard inherits Rectangle {
             background: compare-ta.has-hover ? #7c3aed60 : #7c3aed40;
             border-color: #7c3aed80; border-width: 1px;
             animate background { duration: 130ms; }
-
             Text {
                 text: "↔ Compare";
                 color: #c4b5fd; font-size: 10px; font-weight: 700;
@@ -106,7 +102,7 @@ export component ImageCard inherits Rectangle {
             compare-ta := TouchArea { clicked => { root.view-comparison(); } }
         }
 
-        // Remove button — shown when card is hovered
+        // Remove button — visible on hover
         remove-btn := Rectangle {
             x: parent.width - 28px; y: 8px;
             width: 22px; height: 22px;
@@ -114,30 +110,30 @@ export component ImageCard inherits Rectangle {
             background: #ef4444;
             opacity: root.is-hovered ? 1.0 : 0.0;
             animate opacity { duration: 150ms; }
-
             Text {
                 text: "×"; color: #fff; font-size: 13px; font-weight: 700;
                 horizontal-alignment: center; vertical-alignment: center;
             }
-            // remove TouchArea — ON TOP (declared last within remove-btn)
             remove-ta := TouchArea { clicked => { root.remove(); } }
         }
     }
 
-    // ─── Content area ─────────────────────────────────────────────────
+    // ─── Content area ──────────────────────────────────────────────────────
     VerticalLayout {
         x: 0; y: 165px;
         width: parent.width;
         height: parent.height - 165px;
         padding: 14px;
-        spacing: 10px;
+        spacing: 8px;
 
+        // File name
         Text {
             text: image-data.file-name;
             color: #e2e8f0; font-size: 13px; font-weight: 600;
             overflow: elide;
         }
 
+        // Size info
         HorizontalLayout {
             spacing: 6px; alignment: start;
             Text { text: format-bytes(image-data.original-size); color: #64748b; font-size: 11px; }
@@ -148,12 +144,24 @@ export component ImageCard inherits Rectangle {
             }
         }
 
+        // Dimensions & format
         Text {
             text: image-data.original-width + "×" + image-data.original-height + " · " + image-data.format;
             color: #475569; font-size: 10px;
         }
 
-        // Quality slider
+        // ── Output format selector ─────────────────────────────────────────
+        VerticalLayout {
+            spacing: 4px;
+            Text { text: "Output Format"; color: #94a3b8; font-size: 11px; }
+            ComboBox {
+                model: ["JPEG", "PNG", "WEBP"];
+                current-value: image-data.target-format;
+                selected(fmt) => { root.format-changed(fmt); }
+            }
+        }
+
+        // ── Quality slider ─────────────────────────────────────────────────
         VerticalLayout {
             spacing: 4px;
             HorizontalLayout {
@@ -182,7 +190,6 @@ export component ImageCard inherits Rectangle {
                     border-color: #7c3aed; border-width: 2px;
                 }
 
-                // Slider TouchArea — declared AFTER fill rects so it's on top
                 slider-ta := TouchArea {
                     moved => {
                         if self.pressed {
@@ -198,11 +205,10 @@ export component ImageCard inherits Rectangle {
             }
         }
 
-        // Action buttons
+        // ── Action buttons ─────────────────────────────────────────────────
         HorizontalLayout {
             spacing: 8px; alignment: start;
 
-            // Compress button
             compress-rect := Rectangle {
                 height: 34px; min-width: 80px; border-radius: 8px;
                 background: image-data.status == "done"
@@ -211,7 +217,6 @@ export component ImageCard inherits Rectangle {
                 border-color: image-data.status == "done" ? #7c3aed80 : transparent;
                 border-width: 1px;
                 animate background { duration: 150ms; }
-
                 Text {
                     text: image-data.status == "done" ? "↺ Redo"
                         : image-data.status == "processing" ? "…" : "Compress";
@@ -219,18 +224,15 @@ export component ImageCard inherits Rectangle {
                     font-size: 12px; font-weight: 700;
                     horizontal-alignment: center; vertical-alignment: center;
                 }
-                // TouchArea declared LAST inside compress-rect = on top
                 compress-ta := TouchArea { clicked => { root.compress(); } }
             }
 
-            // Save button (only when done)
             save-rect := Rectangle {
                 visible: image-data.status == "done";
                 width: 34px; height: 34px; border-radius: 8px;
                 background: save-ta.has-hover ? #00d4aa30 : #00d4aa20;
                 border-color: #00d4aa50; border-width: 1px;
                 animate background { duration: 150ms; }
-
                 Text {
                     text: "⬇"; color: #00d4aa; font-size: 14px;
                     horizontal-alignment: center; vertical-alignment: center;

@@ -1,7 +1,10 @@
 [package]
 name = "image-converter"
-version = "0.1.0"
+version = "1.0.2"
 edition = "2021"
+description = "PixelCrush — Efficient and lightweight open-source image compressor"
+keywords = ["image", "compression", "optimizer", "slint", "desktop"]
+license = "MIT"
 
 [[bin]]
 name = "image-converter"

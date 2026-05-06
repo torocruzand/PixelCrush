@@ -18,11 +18,13 @@ export component AppWindow inherits Window {
     preferred-width: 1280px;
     preferred-height: 860px;
     background: #0d0d1a;
+    icon: @image-url("../assets/logo.png");
 
     in-out property <[ImageItem]> images: [];
     in property <bool> is-processing: false;
     in property <string> status-text: "Drop images here";
     in-out property <int> comparison-index: -1;
+    in-out property <bool> show-about: false;
 
     callback add-images();
     callback remove-image(int);
@@ -39,7 +41,7 @@ export component AppWindow inherits Window {
     if images.length == 0: DropZone {
         width: root.width;
         x: -1px;
-        y: -0px;
+        y: 0px;
         height: root.height;
         clicked => {
             root.add-images();
@@ -61,18 +63,10 @@ export component AppWindow inherits Window {
                 image-count: images.length;
                 is-processing: root.is-processing;
                 status-text: root.status-text;
-                compress-all => {
-                    root.compress-all();
-                }
-                add-more => {
-                    root.add-images();
-                }
-                save-all => {
-                    root.save-all();
-                }
-                clear-all => {
-                    root.images = [];
-                }
+                compress-all => { root.compress-all(); }
+                add-more => { root.add-images(); }
+                save-all => { root.save-all(); }
+                clear-all => { root.images = []; }
             }
 
             // Image grid (scrollable)
@@ -86,113 +80,195 @@ export component AppWindow inherits Window {
 
                     // Row 0
                     if images.length > 0: HorizontalLayout {
-                        spacing: 20px;
-                        alignment: start;
+                        spacing: 20px; alignment: start;
                         for img[i] in root.images: ImageCard {
                             visible: i < 4;
-                            image-data: img;
-                            index: i;
-                            remove => {
-                                root.remove-image(i);
-                            }
-                            quality-changed(q) => {
-                                root.set-quality(i, q);
-                            }
-                            compress => {
-                                root.compress-single(i, img.quality);
-                            }
-                            format-changed(f) => {
-                                root.set-format(i, f);
-                            }
-                            view-comparison => {
-                                root.comparison-index = i;
-                            }
-                            save => {
-                                root.export-image(i, img.target-format);
-                            }
+                            image-data: img; index: i;
+                            remove => { root.remove-image(i); }
+                            quality-changed(q) => { root.set-quality(i, q); }
+                            compress => { root.compress-single(i, img.quality); }
+                            format-changed(f) => { root.set-format(i, f); }
+                            view-comparison => { root.comparison-index = i; }
+                            save => { root.export-image(i, img.target-format); }
                         }
                     }
                     // Row 1
                     if images.length > 4: HorizontalLayout {
-                        spacing: 20px;
-                        alignment: start;
+                        spacing: 20px; alignment: start;
                         for img[i] in root.images: ImageCard {
                             visible: i >= 4 && i < 8;
-                            image-data: img;
-                            index: i;
-                            remove => {
-                                root.remove-image(i);
-                            }
-                            quality-changed(q) => {
-                                root.set-quality(i, q);
-                            }
-                            compress => {
-                                root.compress-single(i, img.quality);
-                            }
-                            format-changed(f) => {
-                                root.set-format(i, f);
-                            }
-                            view-comparison => {
-                                root.comparison-index = i;
-                            }
-                            save => {
-                                root.export-image(i, img.target-format);
-                            }
+                            image-data: img; index: i;
+                            remove => { root.remove-image(i); }
+                            quality-changed(q) => { root.set-quality(i, q); }
+                            compress => { root.compress-single(i, img.quality); }
+                            format-changed(f) => { root.set-format(i, f); }
+                            view-comparison => { root.comparison-index = i; }
+                            save => { root.export-image(i, img.target-format); }
                         }
                     }
                     // Row 2
                     if images.length > 8: HorizontalLayout {
-                        spacing: 20px;
-                        alignment: start;
+                        spacing: 20px; alignment: start;
                         for img[i] in root.images: ImageCard {
                             visible: i >= 8 && i < 12;
-                            image-data: img;
-                            index: i;
-                            remove => {
-                                root.remove-image(i);
-                            }
-                            quality-changed(q) => {
-                                root.set-quality(i, q);
-                            }
-                            compress => {
-                                root.compress-single(i, img.quality);
-                            }
-                            format-changed(f) => {
-                                root.set-format(i, f);
-                            }
-                            view-comparison => {
-                                root.comparison-index = i;
-                            }
-                            save => {
-                                root.export-image(i, img.target-format);
-                            }
+                            image-data: img; index: i;
+                            remove => { root.remove-image(i); }
+                            quality-changed(q) => { root.set-quality(i, q); }
+                            compress => { root.compress-single(i, img.quality); }
+                            format-changed(f) => { root.set-format(i, f); }
+                            view-comparison => { root.comparison-index = i; }
+                            save => { root.export-image(i, img.target-format); }
                         }
                     }
                     // Row 3
                     if images.length > 12: HorizontalLayout {
-                        spacing: 20px;
-                        alignment: start;
+                        spacing: 20px; alignment: start;
                         for img[i] in root.images: ImageCard {
                             visible: i >= 12 && i < 16;
-                            image-data: img;
-                            index: i;
-                            remove => {
-                                root.remove-image(i);
+                            image-data: img; index: i;
+                            remove => { root.remove-image(i); }
+                            quality-changed(q) => { root.set-quality(i, q); }
+                            compress => { root.compress-single(i, img.quality); }
+                            format-changed(f) => { root.set-format(i, f); }
+                            view-comparison => { root.comparison-index = i; }
+                            save => { root.export-image(i, img.target-format); }
+                        }
+                    }
+
+                    // ─── About / Credits section ─────────────────────────────────
+                    Rectangle {
+                        height: 1px; background: #ffffff0a;
+                    }
+
+                    Rectangle {
+                        border-radius: 16px;
+                        background: #111125;
+                        border-color: #ffffff10; border-width: 1px;
+
+                        VerticalLayout {
+                            padding: 20px;
+                            spacing: 16px;
+
+                            // Section title row
+                            HorizontalLayout {
+                                spacing: 10px; alignment: start;
+                                Text {
+                                    text: "ℹ About & Tech Stack";
+                                    color: #a78bfa; font-size: 14px; font-weight: 700;
+                                    vertical-alignment: center;
+                                }
                             }
-                            quality-changed(q) => {
-                                root.set-quality(i, q);
+
+                            // Tools grid
+                            HorizontalLayout {
+                                spacing: 12px; alignment: start;
+
+                                // Slint
+                                Rectangle {
+                                    border-radius: 12px;
+                                    background: #7c3aed18;
+                                    border-color: #7c3aed40; border-width: 1px;
+                                    width: 180px; height: 60px;
+                                    HorizontalLayout {
+                                        padding: 12px; spacing: 10px; alignment: start;
+                                        VerticalLayout {
+                                            alignment: center;
+                                            Text { text: "Slint"; color: #c4b5fd; font-size: 13px; font-weight: 700; }
+                                            Text { text: "UI Framework"; color: #64748b; font-size: 10px; }
+                                        }
+                                    }
+                                }
+
+                                // Rust
+                                Rectangle {
+                                    border-radius: 12px;
+                                    background: #2d1a0a;
+                                    border-color: #f9731640; border-width: 1px;
+                                    width: 180px; height: 60px;
+                                    HorizontalLayout {
+                                        padding: 12px; spacing: 10px; alignment: start;
+                                        VerticalLayout {
+                                            alignment: center;
+                                            Text { text: "Rust"; color: #fb923c; font-size: 13px; font-weight: 700; }
+                                            Text { text: "Backend & Performance"; color: #64748b; font-size: 10px; }
+                                        }
+                                    }
+                                }
+
+                                // mozjpeg
+                                Rectangle {
+                                    border-radius: 12px;
+                                    background: #00d4aa18;
+                                    border-color: #00d4aa40; border-width: 1px;
+                                    width: 180px; height: 60px;
+                                    HorizontalLayout {
+                                        padding: 12px; spacing: 10px; alignment: start;
+                                        VerticalLayout {
+                                            alignment: center;
+                                            Text { text: "mozjpeg / oxipng"; color: #34d399; font-size: 12px; font-weight: 700; }
+                                            Text { text: "JPEG & PNG Encoding"; color: #64748b; font-size: 10px; }
+                                        }
+                                    }
+                                }
+
+                                // WebP
+                                Rectangle {
+                                    border-radius: 12px;
+                                    background: #3b82f618;
+                                    border-color: #3b82f640; border-width: 1px;
+                                    width: 180px; height: 60px;
+                                    HorizontalLayout {
+                                        padding: 12px; spacing: 10px; alignment: start;
+                                        VerticalLayout {
+                                            alignment: center;
+                                            Text { text: "libwebp"; color: #60a5fa; font-size: 13px; font-weight: 700; }
+                                            Text { text: "WebP Encoding"; color: #64748b; font-size: 10px; }
+                                        }
+                                    }
+                                }
                             }
-                            compress => {
-                                root.compress-single(i, img.quality);
+
+                            // Slint license notice
+                            Rectangle {
+                                border-radius: 10px;
+                                background: #7c3aed10;
+                                border-color: #7c3aed30; border-width: 1px;
+                                height: 44px;
+
+                                HorizontalLayout {
+                                    padding-left: 14px; padding-right: 14px;
+                                    spacing: 10px; alignment: start;
+
+                                    Text {
+                                        text: "Built with";
+                                        color: #64748b; font-size: 11px;
+                                        vertical-alignment: center;
+                                    }
+                                    // Slint logo badge
+                                    Rectangle {
+                                        border-radius: 6px;
+                                        background: #7c3aed30;
+                                        border-color: #7c3aed60; border-width: 1px;
+                                        width: 54px; height: 24px;
+                                        Text {
+                                            text: "Slint";
+                                            color: #a78bfa; font-size: 11px; font-weight: 800;
+                                            horizontal-alignment: center; vertical-alignment: center;
+                                        }
+                                    }
+                                    Text {
+                                        text: "— GUI powered by Slint (slint.dev) under the Slint Royalty-Free License.";
+                                        color: #475569; font-size: 10px;
+                                        vertical-alignment: center;
+                                    }
+                                }
                             }
-                            format-changed(f) => {
-                                root.set-format(i, f);
-                            }
-                            view-comparison => {
-                                root.comparison-index = i;
-                            }
-                            save => {
-                                root.export-image(i, img.target-format);
+
+                            // Version / copyright
+                            Text {
+                                text: "PixelCrush v1.0.2 — © 2025 — MIT License";
+                                color: #334155; font-size: 10px;
+                                horizontal-alignment: right;
                             }
                         }
                     }
@@ -201,19 +277,15 @@ export component AppWindow inherits Window {
         }
     }
 
-    // ─── COMPARISON OVERLAY ──────────────────────────────────────────────
+    // ─── COMPARISON OVERLAY ───────────────────────────────────────────────
     if comparison-index >= 0 && images.length > comparison-index: ComparisonSlider {
-        x: 0;
-        y: 0;
-        width: root.width;
-        height: root.height;
+        x: 0; y: 0;
+        width: root.width; height: root.height;
         before-image: images[comparison-index].thumbnail;
         after-image: images[comparison-index].compressed-thumbnail;
         file-name: images[comparison-index].file-name;
         original-size: images[comparison-index].original-size;
         compressed-size: images[comparison-index].compressed-size;
-        close => {
-            root.comparison-index = -1;
-        }
+        close => { root.comparison-index = -1; }
     }
 }

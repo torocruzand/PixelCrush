@@ -334,7 +334,7 @@ fn add_paths_to_model(ui: &AppWindow, state: &Arc<Mutex<AppState>>, paths: Vec<P
                 width: w,
                 height: h,
                 format: ext.clone(),
-                quality: 80,
+                quality: 90,
                 target_format: target_fmt,
                 compressed_data: None,
                 compressed_size: 0,
@@ -358,7 +358,7 @@ fn add_paths_to_model(ui: &AppWindow, state: &Arc<Mutex<AppState>>, paths: Vec<P
                 original_height: h as i32,
                 format: ext.into(),
                 target_format: target_fmt.display_name().into(),
-                quality: 80,
+                quality: 90,
                 status: "pending".into(),
                 thumbnail: Image::default(), // placeholder while loading
                 compressed_thumbnail: Image::default(),

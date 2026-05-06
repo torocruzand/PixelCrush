@@ -24,9 +24,16 @@ export component ToolBar inherits Rectangle {
         spacing: 12px;
         alignment: center;
 
-        // Logo
+        // ── Logo + icon ────────────────────────────────────────────────────
+        Image {
+            source: @image-url("../assets/logo.png");
+            width: 36px;
+            height: 36px;
+            image-fit: contain;
+        }
+
         Text {
-            text: "✦ PixelCrush";
+            text: "PixelCrush";
             color: #a78bfa; font-size: 18px; font-weight: 800;
             vertical-alignment: center;
         }
@@ -40,7 +47,7 @@ export component ToolBar inherits Rectangle {
             vertical-alignment: center;
         }
 
-        // Count badge (no interaction)
+        // Count badge
         Rectangle {
             width: 80px; height: 36px;
             border-radius: 18px;
@@ -52,30 +59,27 @@ export component ToolBar inherits Rectangle {
             }
         }
 
-        // ── Add More ──────────────────────────────────────────────────
+        // ── Add More ───────────────────────────────────────────────────────
         add-btn := Rectangle {
             width: 110px; height: 36px;
             border-radius: 8px;
             background: add-ta.has-hover ? #2a2a4a : #1e1e38;
             border-color: #ffffff18; border-width: 1px;
             animate background { duration: 150ms; }
-
             Text {
                 text: "+ Add More";
                 color: #94a3b8; font-size: 12px; font-weight: 600;
                 horizontal-alignment: center; vertical-alignment: center;
             }
-            // Single TouchArea — last = on top
             add-ta := TouchArea { clicked => { root.add-more(); } }
         }
 
-        // ── Compress All ──────────────────────────────────────────────
+        // ── Compress All ───────────────────────────────────────────────────
         compress-btn := Rectangle {
             width: 130px; height: 36px;
             border-radius: 8px;
             background: is-processing ? #3b1f7a : #7c3aed;
             animate background { duration: 200ms; }
-
             Text {
                 text: is-processing ? "Processing…" : "⚡ Compress All";
                 color: #fff; font-size: 12px; font-weight: 700;
@@ -84,14 +88,13 @@ export component ToolBar inherits Rectangle {
             TouchArea { clicked => { root.compress-all(); } }
         }
 
-        // ── Save All ──────────────────────────────────────────────────
+        // ── Save All ───────────────────────────────────────────────────────
         save-btn := Rectangle {
             width: 100px; height: 36px;
             border-radius: 8px;
             background: save-ta.has-hover ? #00d4aa30 : #00d4aa20;
             border-color: #00d4aa60; border-width: 1px;
             animate background { duration: 150ms; }
-
             Text {
                 text: "⬇ Save All";
                 color: #00d4aa; font-size: 12px; font-weight: 600;
@@ -100,14 +103,13 @@ export component ToolBar inherits Rectangle {
             save-ta := TouchArea { clicked => { root.save-all(); } }
         }
 
-        // ── Clear ─────────────────────────────────────────────────────
+        // ── Clear ──────────────────────────────────────────────────────────
         clear-btn := Rectangle {
             width: 36px; height: 36px;
             border-radius: 8px;
             background: clear-ta.has-hover ? #ef444430 : #ef444418;
             border-color: #ef444430; border-width: 1px;
             animate background { duration: 150ms; }
-
             Text {
                 text: "🗑"; font-size: 14px;
                 horizontal-alignment: center; vertical-alignment: center;
