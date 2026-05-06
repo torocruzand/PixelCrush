@@ -13,7 +13,8 @@ export component ComparisonSlider inherits Rectangle {
 
     // Backdrop blur effect (simulated with semi-transparent overlay)
     Rectangle {
-        x: 0; y: 0;
+        x: 0;
+        y: 0;
         width: parent.width;
         height: parent.height;
         background: #000000b0;
@@ -58,7 +59,9 @@ export component ComparisonSlider inherits Rectangle {
                         vertical-alignment: center;
                     }
 
-                    Rectangle { horizontal-stretch: 1; }
+                    Rectangle {
+                        horizontal-stretch: 1;
+                    }
 
                     // Sizes
                     Text {
@@ -67,35 +70,6 @@ export component ComparisonSlider inherits Rectangle {
                         font-size: 13px;
                         font-weight: 700;
                         vertical-alignment: center;
-                    }
-
-                    // Close
-                    close-btn := Rectangle {
-                        width: 32px;
-                        height: 32px;
-                        border-radius: 16px;
-                        background: #ef444420;
-                        border-color: #ef444440;
-                        border-width: 1px;
-                        animate background { duration: 130ms; }
-
-                        Text {
-                            text: "×";
-                            color: #f87171;
-                            font-size: 16px;
-                            font-weight: 700;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
-                        }
-
-                        TouchArea {
-                            clicked => { root.close(); }
-                        }
-
-                        states [
-                            hovered when close-ta.has-hover: { background: #ef444440; }
-                        ]
-                        close-ta := TouchArea {}
                     }
                 }
             }
@@ -228,13 +202,21 @@ export component ComparisonSlider inherits Rectangle {
     // Click outside to close
     TouchArea {
         z: -1;
-        clicked => { root.close(); }
+        clicked => {
+            root.close();
+        }
     }
 
     pure function format-bytes(bytes: int) -> string {
-        if bytes <= 0 { return "—"; }
-        if bytes < 1024 { return bytes + " B"; }
-        if bytes < 1048576 { return round(bytes / 102.4) / 10 + " KB"; }
+        if bytes <= 0 {
+            return "—";
+        }
+        if bytes < 1024 {
+            return bytes + " B";
+        }
+        if bytes < 1048576 {
+            return round(bytes / 102.4) / 10 + " KB";
+        }
         return round(bytes / 104857.6) / 10 + " MB";
     }
 }
