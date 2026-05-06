@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2026-05-06
+
+### Added
+- Limiters for Maximum Dimension and Target File Size (percentage of original) to ImageCard.
+- Target File Size limiter performs a 2-pass encoding search to achieve the desired file size.
+- "Apply to All" button added to each image card to quickly clone settings across the queue.
+- Global transparent blocking overlay and loading indicator during image processing to prevent unintended interactions.
+
+### Fixed
+- Fixed an issue on Windows where a console window would appear when launching the binary.
+
 ## [1.0.4] - 2026-05-06
 
 ### Added

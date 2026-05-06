@@ -1,6 +1,6 @@
 [package]
 name = "PixelCrush"
-version = "1.0.4"
+version = "1.0.5"
 edition = "2021"
 description = "PixelCrush — Efficient and lightweight open-source image compressor"
 keywords = ["image", "compression", "optimizer", "slint", "desktop"]
