@@ -41,6 +41,12 @@ bytemuck = "1.16"
 slint-build = "1.9"
 winres = "0.1"
 
+[package.metadata.bundle]
+name = "PixelCrush"
+identifier = "com.torocruzand.pixelcrush"
+icon = ["assets/icon.icns"]
+short_description = "Efficient open-source image compressor"
+
 [profile.release]
 opt-level = 3
 lto = true
