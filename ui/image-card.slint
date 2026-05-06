@@ -172,8 +172,8 @@ export component ImageCard inherits Rectangle {
             SpinBox {
                 height: 24px;
                 value: image-data.max-dimension;
-                minimum: 0;
-                maximum: 99999;
+                minimum: 16;
+                maximum: Math.max(16, Math.max(image-data.original-width, image-data.original-height));
                 edited => { root.max-dimension-changed(self.value); }
             }
         }

@@ -322,7 +322,18 @@ impl App {
         {
             let ui2 = ui.clone();
             let state2 = Arc::clone(&state);
-            self.ui.on_set_max_dimension(move |index: i32, dim: i32| {
+            self.ui.on_set_max_dimension(move |index: i32, mut dim: i32| {
+                let max_possible = {
+                    let st = state2.lock().unwrap();
+                    if let Some(rec) = st.records.get(index as usize) {
+                        rec.width.max(rec.height) as i32
+                    } else {
+                        99999
+                    }
+                };
+
+                dim = dim.clamp(16, max_possible);
+
                 {
                     let mut st = state2.lock().unwrap();
                     if let Some(rec) = st.records.get_mut(index as usize) {
@@ -401,6 +412,8 @@ fn add_paths_to_model(ui: &AppWindow, state: &Arc<Mutex<AppState>>, paths: Vec<P
             let id = st.next_id;
             st.next_id += 1;
 
+            let max_dim_default = (w.max(h) as i32).max(16);
+
             st.records.push(ImageRecord {
                 id,
                 path: path.clone(),
@@ -413,7 +426,7 @@ fn add_paths_to_model(ui: &AppWindow, state: &Arc<Mutex<AppState>>, paths: Vec<P
                 compressed_data: None,
                 compressed_size: 0,
                 target_size_percent: 0,
-                max_dimension: 0,
+                max_dimension: max_dim_default,
             });
 
             let file_name: SharedString = path
@@ -440,7 +453,7 @@ fn add_paths_to_model(ui: &AppWindow, state: &Arc<Mutex<AppState>>, paths: Vec<P
                 compressed_thumbnail: Image::default(),
                 compression_ratio: 0.0,
                 target_size_percent: 0,
-                max_dimension: 0,
+                max_dimension: max_dim_default,
             });
         }
     }
