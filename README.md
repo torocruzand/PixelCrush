@@ -53,6 +53,15 @@ cargo run --release
 
 ---
 
+## Running Unsigned Binaries
+
+Since these releases are not code-signed, your operating system might warn you before opening them.
+- **Windows**: You may see a "Windows protected your PC" SmartScreen popup. Click **More info**, then **Run anyway**.
+- **macOS**: If you see an "App cannot be opened" warning, right-click (or Control-click) the application file and select **Open**. You may need to click **Open** again in the confirmation dialog.
+- **Linux**: Remember to make the binary executable before running: `chmod +x pixelcrush-linux-x86_64`.
+
+---
+
 ## Tech Stack
 
 | Tool | Role |
@@ -69,7 +78,7 @@ cargo run --release
 
 ## License
 
-MIT License — © 2025
+MIT License — © 2026 [torocruzand](https://torocruzand.com)
 
 ---
 
