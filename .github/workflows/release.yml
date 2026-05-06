@@ -17,10 +17,10 @@ jobs:
             artifact_name: pixelcrush-linux-x86_64
           - os: macos-latest
             target: x86_64-apple-darwin
-            artifact_name: pixelcrush-macos-x86_64
+            artifact_name: pixelcrush-macos-x86_64.zip
           - os: macos-latest
             target: aarch64-apple-darwin
-            artifact_name: pixelcrush-macos-aarch64
+            artifact_name: pixelcrush-macos-aarch64.zip
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             artifact_name: pixelcrush-windows-x86_64.exe
@@ -46,13 +46,21 @@ jobs:
       - name: Build target
         run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Rename artifact (Unix)
-        if: matrix.os != 'windows-latest'
-        run: mv target/${{ matrix.target }}/release/image-converter ${{ matrix.artifact_name }}
+      - name: Bundle and Zip Mac App
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          cargo install cargo-bundle
+          cargo bundle --release --target ${{ matrix.target }}
+          cd target/${{ matrix.target }}/release/bundle/osx
+          zip -r ../../../../../${{ matrix.artifact_name }} PixelCrush.app
+
+      - name: Rename artifact (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: mv target/${{ matrix.target }}/release/PixelCrush ${{ matrix.artifact_name }}
 
       - name: Rename artifact (Windows)
         if: matrix.os == 'windows-latest'
-        run: mv target/${{ matrix.target }}/release/image-converter.exe ${{ matrix.artifact_name }}
+        run: mv target/${{ matrix.target }}/release/PixelCrush.exe ${{ matrix.artifact_name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
