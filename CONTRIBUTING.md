@@ -6,7 +6,7 @@ The following is a set of guidelines for contributing to PixelCrush. These are m
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [PixelCrush Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to hello@torocruzand.com.
+This project and everyone participating in it is governed by the [PixelCrush Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to torocruzand@gemail.com.
 
 ## How Can I Contribute?
 
