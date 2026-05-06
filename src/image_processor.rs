@@ -57,6 +57,8 @@ pub struct CompressionOptions {
     pub target_format: OutputFormat,
     /// Resize if any dimension exceeds this value (None = no resize)
     pub max_dimension: Option<u32>,
+    /// Target file size in bytes. If set, ignores `quality` and performs multiple passes.
+    pub target_size: Option<usize>,
 }
 
 impl Default for CompressionOptions {
@@ -65,6 +67,7 @@ impl Default for CompressionOptions {
             quality: 80,
             target_format: OutputFormat::Jpeg,
             max_dimension: None,
+            target_size: None,
         }
     }
 }
@@ -115,12 +118,29 @@ impl ImageProcessor {
 
         let (w, h) = (img.width(), img.height());
 
-        let data = match options.target_format {
-            OutputFormat::Jpeg => Self::encode_jpeg(&img, options.quality)?,
-            OutputFormat::Png => Self::encode_png(&img, options.quality)?,
-            OutputFormat::WebP => Self::encode_webp(&img, options.quality)?,
-            OutputFormat::Gif => Self::encode_fallback(&img, ImageFormat::Gif)?,
-            OutputFormat::Bmp => Self::encode_fallback(&img, ImageFormat::Bmp)?,
+        let data = if let Some(target) = options.target_size {
+            // Binary search to hit target size (up to 6 passes)
+            let mut min_q = 1;
+            let mut max_q = 100;
+            let mut best_data = None;
+
+            for _ in 0..6 {
+                let q = (min_q + max_q) / 2;
+                let enc = Self::encode_inner(&img, q, options.target_format)?;
+                if enc.len() <= target {
+                    best_data = Some(enc);
+                    min_q = q + 1; // Try to get higher quality that still fits
+                } else {
+                    max_q = q - 1; // Reduce size
+                }
+                if min_q > max_q {
+                    break;
+                }
+            }
+            // If even Q=1 was too big, fallback to Q=1
+            best_data.unwrap_or_else(|| Self::encode_inner(&img, 1, options.target_format).unwrap())
+        } else {
+            Self::encode_inner(&img, options.quality, options.target_format)?
         };
 
         Ok(ProcessedImage {
@@ -129,6 +149,16 @@ impl ImageProcessor {
             width: w,
             height: h,
         })
+    }
+
+    fn encode_inner(img: &DynamicImage, quality: u8, format: OutputFormat) -> Result<Vec<u8>> {
+        match format {
+            OutputFormat::Jpeg => Self::encode_jpeg(img, quality),
+            OutputFormat::Png => Self::encode_png(img, quality),
+            OutputFormat::WebP => Self::encode_webp(img, quality),
+            OutputFormat::Gif => Self::encode_fallback(img, ImageFormat::Gif),
+            OutputFormat::Bmp => Self::encode_fallback(img, ImageFormat::Bmp),
+        }
     }
 
     // ── JPEG via mozjpeg ─────────────────────────────────────

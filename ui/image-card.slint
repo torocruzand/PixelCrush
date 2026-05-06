@@ -11,9 +11,13 @@ export component ImageCard inherits Rectangle {
     callback format-changed(string);
     callback view-comparison();
     callback save();
+    callback limit-size-changed(bool);
+    callback target-size-percent-changed(int);
+    callback max-dimension-changed(string);
+    callback apply-to-all();
 
     width: 280px;
-    height: 450px;
+    height: 520px;
     border-radius: 16px;
     property <bool> is-hovered: card-hover-ta.has-hover || remove-ta.has-hover
         || compare-ta.has-hover || slider-ta.has-hover
@@ -161,31 +165,59 @@ export component ImageCard inherits Rectangle {
             }
         }
 
-        // ── Quality slider ─────────────────────────────────────────────────
+        // ── Max Dimension ──────────────────────────────────────────────────
+        VerticalLayout {
+            spacing: 4px;
+            Text { text: "Max Dimension (px)"; color: #94a3b8; font-size: 11px; }
+            Rectangle {
+                height: 24px; border-radius: 4px; background: #0a0a18; border-color: #ffffff20; border-width: 1px;
+                TextInput {
+                    x: 6px; y: 4px; width: parent.width - 12px; height: 16px;
+                    text: image-data.max-dimension;
+                    color: #e2e8f0; font-size: 11px;
+                    single-line: true;
+                    accepted => { root.max-dimension-changed(self.text); }
+                    edited => { root.max-dimension-changed(self.text); }
+                }
+            }
+        }
+
+        // ── Quality / Target Size Limiter ──────────────────────────────────
         VerticalLayout {
             spacing: 4px;
             HorizontalLayout {
                 alignment: stretch;
-                Text { text: "Quality"; color: #94a3b8; font-size: 11px; vertical-alignment: center; }
+                HorizontalLayout {
+                    spacing: 6px;
+                    Text { text: image-data.limit-size ? "Target Size" : "Quality"; color: #94a3b8; font-size: 11px; vertical-alignment: center; }
+                    Rectangle {
+                        width: 32px; height: 14px; border-radius: 4px;
+                        background: image-data.limit-size ? #7c3aed40 : #1e1e38;
+                        border-width: 1px; border-color: image-data.limit-size ? #7c3aed : #ffffff20;
+                        Text { text: "SIZE"; color: image-data.limit-size ? #a78bfa : #64748b; font-size: 8px; font-weight: 700; horizontal-alignment: center; vertical-alignment: center; }
+                        TouchArea { clicked => { root.limit-size-changed(!image-data.limit-size); } }
+                    }
+                }
                 Text {
-                    text: image-data.quality + "%";
+                    text: image-data.limit-size ? (image-data.target-size-percent + "%") : (image-data.quality + "%");
                     color: #a78bfa; font-size: 11px; font-weight: 700;
                     horizontal-alignment: right; vertical-alignment: center;
                 }
             }
 
             quality-track := Rectangle {
+                property <float> progress: image-data.limit-size ? (image-data.target-size-percent / 100.0) : (image-data.quality / 100.0);
                 height: 6px; border-radius: 3px; background: #1e1e38;
 
                 Rectangle {
                     x: 0;
-                    width: parent.width * (image-data.quality / 100.0);
+                    width: parent.width * quality-track.progress;
                     height: 6px; border-radius: 3px;
                     background: @linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
                     animate width { duration: 120ms; }
                 }
                 Rectangle {
-                    x: (parent.width * (image-data.quality / 100.0)) - 7px;
+                    x: (parent.width * quality-track.progress) - 7px;
                     y: -4px; width: 14px; height: 14px;
                     border-radius: 7px; background: #a78bfa;
                     border-color: #7c3aed; border-width: 2px;
@@ -194,12 +226,14 @@ export component ImageCard inherits Rectangle {
                 slider-ta := TouchArea {
                     moved => {
                         if self.pressed {
-                            root.quality-changed(clamp(round(self.mouse-x / quality-track.width * 100), 1, 100));
+                            let val = clamp(round(self.mouse-x / quality-track.width * 100), 1, 100);
+                            if image-data.limit-size { root.target-size-percent-changed(val); } else { root.quality-changed(val); }
                         }
                     }
                     pointer-event(e) => {
                         if e.button == PointerEventButton.left && e.kind == PointerEventKind.down {
-                            root.quality-changed(clamp(round(self.mouse-x / quality-track.width * 100), 1, 100));
+                            let val = clamp(round(self.mouse-x / quality-track.width * 100), 1, 100);
+                            if image-data.limit-size { root.target-size-percent-changed(val); } else { root.quality-changed(val); }
                         }
                     }
                 }
@@ -227,6 +261,20 @@ export component ImageCard inherits Rectangle {
                 }
                 compress-ta := TouchArea { clicked => { root.compress(); } }
             }
+
+            apply-all-rect := Rectangle {
+                height: 34px; width: 80px; border-radius: 8px;
+                background: apply-ta.has-hover ? #334155 : #1e293b;
+                border-color: #475569; border-width: 1px;
+                animate background { duration: 150ms; }
+                Text {
+                    text: "Apply to All"; color: #cbd5e1; font-size: 11px; font-weight: 600;
+                    horizontal-alignment: center; vertical-alignment: center;
+                }
+                apply-ta := TouchArea { clicked => { root.apply-to-all(); } }
+            }
+
+            Rectangle { horizontal-stretch: 1; }
 
             save-rect := Rectangle {
                 visible: image-data.status == "done";

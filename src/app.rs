@@ -26,6 +26,9 @@ pub struct ImageRecord {
     pub target_format: OutputFormat,
     pub compressed_data: Option<Vec<u8>>,
     pub compressed_size: usize,
+    pub limit_size: bool,
+    pub target_size_percent: i32,
+    pub max_dimension: String,
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -298,6 +301,98 @@ impl App {
                 .ok();
             });
         }
+
+        // ── set-limit-size ───────────────────────────────────
+        {
+            let ui2 = ui.clone();
+            let state2 = Arc::clone(&state);
+            self.ui.on_set_limit_size(move |index: i32, limit: bool| {
+                {
+                    let mut st = state2.lock().unwrap();
+                    if let Some(rec) = st.records.get_mut(index as usize) {
+                        rec.limit_size = limit;
+                    }
+                }
+                ui2.upgrade_in_event_loop(move |ui| {
+                    update_item(&ui, index as usize, |item| { item.limit_size = limit; });
+                }).ok();
+            });
+        }
+
+        // ── set-target-size-percent ──────────────────────────
+        {
+            let ui2 = ui.clone();
+            let state2 = Arc::clone(&state);
+            self.ui.on_set_target_size_percent(move |index: i32, pct: i32| {
+                {
+                    let mut st = state2.lock().unwrap();
+                    if let Some(rec) = st.records.get_mut(index as usize) {
+                        rec.target_size_percent = pct;
+                    }
+                }
+                ui2.upgrade_in_event_loop(move |ui| {
+                    update_item(&ui, index as usize, |item| { item.target_size_percent = pct; });
+                }).ok();
+            });
+        }
+
+        // ── set-max-dimension ────────────────────────────────
+        {
+            let ui2 = ui.clone();
+            let state2 = Arc::clone(&state);
+            self.ui.on_set_max_dimension(move |index: i32, dim: SharedString| {
+                let dim_str = dim.to_string();
+                {
+                    let mut st = state2.lock().unwrap();
+                    if let Some(rec) = st.records.get_mut(index as usize) {
+                        rec.max_dimension = dim_str.clone();
+                    }
+                }
+                ui2.upgrade_in_event_loop(move |ui| {
+                    update_item(&ui, index as usize, |item| { item.max_dimension = dim.clone(); });
+                }).ok();
+            });
+        }
+
+        // ── apply-to-all ─────────────────────────────────────
+        {
+            let ui2 = ui.clone();
+            let state2 = Arc::clone(&state);
+            self.ui.on_apply_to_all(move |src_index: i32| {
+                let (fmt, q, limit_sz, pct, max_dim) = {
+                    let st = state2.lock().unwrap();
+                    if let Some(rec) = st.records.get(src_index as usize) {
+                        (rec.target_format, rec.quality, rec.limit_size, rec.target_size_percent, rec.max_dimension.clone())
+                    } else {
+                        return;
+                    }
+                };
+
+                {
+                    let mut st = state2.lock().unwrap();
+                    for rec in &mut st.records {
+                        rec.target_format = fmt;
+                        rec.quality = q;
+                        rec.limit_size = limit_sz;
+                        rec.target_size_percent = pct;
+                        rec.max_dimension = max_dim.clone();
+                    }
+                }
+
+                ui2.upgrade_in_event_loop(move |ui| {
+                    let model = ui.get_images();
+                    for i in 0..model.row_count() {
+                        let mut item = model.row_data(i).unwrap();
+                        item.target_format = fmt.display_name().into();
+                        item.quality = q;
+                        item.limit_size = limit_sz;
+                        item.target_size_percent = pct;
+                        item.max_dimension = max_dim.clone().into();
+                        model.set_row_data(i, item);
+                    }
+                }).ok();
+            });
+        }
     }
 }
 
@@ -338,6 +433,9 @@ fn add_paths_to_model(ui: &AppWindow, state: &Arc<Mutex<AppState>>, paths: Vec<P
                 target_format: target_fmt,
                 compressed_data: None,
                 compressed_size: 0,
+                limit_size: false,
+                target_size_percent: 50,
+                max_dimension: "".to_string(),
             });
 
             let file_name: SharedString = path
@@ -363,6 +461,9 @@ fn add_paths_to_model(ui: &AppWindow, state: &Arc<Mutex<AppState>>, paths: Vec<P
                 thumbnail: Image::default(), // placeholder while loading
                 compressed_thumbnail: Image::default(),
                 compression_ratio: 0.0,
+                limit_size: false,
+                target_size_percent: 50,
+                max_dimension: "".into(),
             });
         }
     }
@@ -425,22 +526,39 @@ fn add_paths_to_model(ui: &AppWindow, state: &Arc<Mutex<AppState>>, paths: Vec<P
 // ──────────────────────────────────────────────────────────────
 fn compress_one(
     index: usize,
-    quality: u8,
+    _quality_unused: u8,
     state: &Arc<Mutex<AppState>>,
     ui: &slint::Weak<AppWindow>,
 ) {
-    let (path, target_format, orig_size) = {
+    let (path, target_format, orig_size, quality, limit_size, target_size_pct, max_dim_str) = {
         let st = state.lock().unwrap();
         match st.records.get(index) {
-            Some(rec) => (rec.path.clone(), rec.target_format, rec.original_size),
+            Some(rec) => (
+                rec.path.clone(),
+                rec.target_format,
+                rec.original_size,
+                rec.quality,
+                rec.limit_size,
+                rec.target_size_percent,
+                rec.max_dimension.clone(),
+            ),
             None => return,
         }
     };
 
+    let max_dim: Option<u32> = max_dim_str.parse().ok();
+
+    let target_size = if limit_size {
+        Some((orig_size as f64 * (target_size_pct as f64 / 100.0)) as usize)
+    } else {
+        None
+    };
+
     let opts = CompressionOptions {
-        quality,
+        quality: quality as u8,
         target_format,
-        max_dimension: None,
+        max_dimension: max_dim,
+        target_size,
     };
 
     match ImageProcessor::process(&path, &opts) {

@@ -36,6 +36,10 @@ export component AppWindow inherits Window {
     callback set-format(int, string);
     callback save-all();
     callback close-comparison();
+    callback set-limit-size(int, bool);
+    callback set-target-size-percent(int, int);
+    callback set-max-dimension(int, string);
+    callback apply-to-all(int);
 
     // ─── EMPTY STATE: Drop Zone ───────────────────────────────────────────
     if images.length == 0: DropZone {
@@ -89,32 +93,25 @@ export component AppWindow inherits Window {
                     // Responsive dynamic grid for any number of images
                 Rectangle {
                         property <int> cols: Math.max(1, Math.floor((root.width - 48px) / 300px));
-                        height: 24px + Math.ceil(images.length / cols) * 470px;
+                        height: 24px + Math.ceil(images.length / cols) * 540px;
 
                         for img[i] in root.images: ImageCard {
                             x: 24px + (i - Math.floor(i / cols) * cols) * 300px;
-                            y: 24px + Math.floor(i / cols) * 470px;
+                            y: 24px + Math.floor(i / cols) * 540px;
 
                             image-data: img;
                             index: i;
-                            remove => {
-                                root.remove-image(i);
-                            }
-                            quality-changed(q) => {
-                                root.set-quality(i, q);
-                            }
-                            compress => {
-                                root.compress-single(i, img.quality);
-                            }
-                            format-changed(f) => {
-                                root.set-format(i, f);
-                            }
-                            view-comparison => {
-                                root.comparison-index = i;
-                            }
-                            save => {
-                                root.export-image(i, img.target-format);
-                            }
+                            remove => { root.remove-image(i); }
+                            quality-changed(q) => { root.set-quality(i, q); }
+                            compress => { root.compress-single(i, img.quality); }
+                            format-changed(f) => { root.set-format(i, f); }
+                            view-comparison => { root.comparison-index = i; }
+                            save => { root.export-image(i, img.target-format); }
+                            
+                            limit-size-changed(v) => { root.set-limit-size(i, v); }
+                            target-size-percent-changed(p) => { root.set-target-size-percent(i, p); }
+                            max-dimension-changed(d) => { root.set-max-dimension(i, d); }
+                            apply-to-all => { root.apply-to-all(i); }
                         }
                     }
 
