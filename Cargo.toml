@@ -1,5 +1,5 @@
 [package]
-name = "image-converter"
+name = "PixelCrush"
 version = "1.0.4"
 edition = "2021"
 description = "PixelCrush — Efficient and lightweight open-source image compressor"
@@ -7,16 +7,27 @@ keywords = ["image", "compression", "optimizer", "slint", "desktop"]
 license = "MIT"
 
 [[bin]]
-name = "image-converter"
+name = "PixelCrush"
 path = "src/main.rs"
 
 [dependencies]
 slint = "1.9"
 image = { version = "0.25", default-features = false, features = [
-    "png", "jpeg", "webp", "gif", "bmp", "tiff",
+    "png",
+    "jpeg",
+    "webp",
+    "gif",
+    "bmp",
+    "tiff",
 ] }
-mozjpeg = { version = "0.10", default-features = false, features = ["with_simd"] }
-oxipng = { version = "9", default-features = false, features = ["filetime", "parallel", "zopfli"] }
+mozjpeg = { version = "0.10", default-features = false, features = [
+    "with_simd",
+] }
+oxipng = { version = "9", default-features = false, features = [
+    "filetime",
+    "parallel",
+    "zopfli",
+] }
 webp = "0.3"
 anyhow = "1.0"
 rayon = "1.10"

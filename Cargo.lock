@@ -3,6 +3,26 @@
 version = 4
 
 [[package]]
+name = "PixelCrush"
+version = "1.0.4"
+dependencies = [
+ "anyhow",
+ "bytemuck",
+ "dirs",
+ "image",
+ "mozjpeg",
+ "once_cell",
+ "oxipng",
+ "rayon",
+ "rfd",
+ "serde",
+ "slint",
+ "slint-build",
+ "webp",
+ "winres",
+]
+
+[[package]]
 name = "ab_glyph"
 version = "0.2.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2361,26 +2381,6 @@ dependencies = [
  "tiff",
  "zune-core",
  "zune-jpeg",
-]
-
-[[package]]
-name = "image-converter"
-version = "1.0.2"
-dependencies = [
- "anyhow",
- "bytemuck",
- "dirs",
- "image",
- "mozjpeg",
- "once_cell",
- "oxipng",
- "rayon",
- "rfd",
- "serde",
- "slint",
- "slint-build",
- "webp",
- "winres",
 ]
 
 [[package]]

@@ -21,7 +21,7 @@ PixelCrush is a modern, blazingly fast **desktop image optimization** tool built
 
 ## Download
 
-Pre-compiled binaries for **Windows**, **macOS**, and **Linux** are available on the [**Releases page →**](https://github.com/torocruzand/imageConverter/releases)
+Pre-compiled binaries for **Windows**, **macOS**, and **Linux** are available on the [**Releases page →**](https://github.com/torocruzand/PixelCrush/releases)
 
 | Platform | File |
 |---|---|
@@ -46,8 +46,8 @@ Pre-compiled binaries for **Windows**, **macOS**, and **Linux** are available on
 
 ### Build & Run
 ```bash
-git clone https://github.com/torocruzand/imageConverter.git
-cd imageConverter
+git clone https://github.com/torocruzand/PixelCrush.git
+cd PixelCrush
 cargo run --release
 ```
 

@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation for running unsigned binaries on macOS and Windows in `README.md`.
 
 ### Changed
-- Improved application UI identity and updated copyright year to 2026 under ToroCruzAnd branding.
+- Improved application UI identity and updated copyright year to 2026 under torocruzand branding.
 - Enhanced responsive image grid system using a dynamic layout algorithm in Slint that prevents spacing issues with hidden elements.
 - Centered header toolbar buttons vertically for a more polished aesthetic.
 - Increased default compression quality from 80% to 90% for higher fidelity output.
